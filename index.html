@@ -2,9 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cigarette Shop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 80%;
+      margin: 20px auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .product, .cart-item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: white;
+    }
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-$END$
+<div class="container">
+  <h1>Cigarette Shop</h1>
+  <h2>Products</h2>
+  <div id="products"></div>
+
+  <h2>Your Cart</h2>
+  <div id="cart"></div>
+  <button id="clearCartBtn">Clear Cart</button>
+</div>
+
+<script>
+  const productsContainer = document.getElementById('products');
+  const cartContainer = document.getElementById('cart');
+  const clearCartBtn = document.getElementById('clearCartBtn');
+
+  async function fetchProducts() {
+    const response = await fetch('/cigarettes');
+    const products = await response.json();
+    productsContainer.innerHTML = '';
+    products.forEach(product => {
+      const div = document.createElement('div');
+      div.classList.add('product');
+      div.innerHTML = `
+                    <h3>${product.brand}</h3>
+                    <p>Price: $${product.price}</p>
+                    <button onclick="addToCart('${product.brand}', ${product.price})">Add to Cart</button>
+                `;
+      productsContainer.appendChild(div);
+    });
+  }
+
+  async function fetchCart() {
+    const response = await fetch('/cart');
+    const cart = await response.json();
+    cartContainer.innerHTML = '';
+    cart.forEach(item => {
+      const div = document.createElement('div');
+      div.classList.add('cart-item');
+      div.innerHTML = `
+                    <h4>${item.brand}</h4>
+                    <p>Price: $${item.price}</p>
+                    <button onclick="removeFromCart('${item.brand}')">Remove</button>
+                `;
+      cartContainer.appendChild(div);
+    });
+  }
+
+  async function addToCart(brand, price) {
+    const product = { brand, price };
+    await fetch('/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(product)
+    });
+    fetchCart();
+  }
+
+  async function removeFromCart(brand) {
+    const product = { brand };
+    await fetch('/cart/remove', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(product)
+    });
+    fetchCart();
+  }
+
+  async function clearCart() {
+    await fetch('/cart/clear', { method: 'POST' });
+    fetchCart();
+  }
+
+  clearCartBtn.addEventListener('click', clearCart);
+
+  fetchProducts();
+  fetchCart();
+</script>
 </body>
 </html>

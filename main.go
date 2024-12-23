@@ -154,11 +154,49 @@ func main() {
 	r.HandleFunc("/cigarettes", getAllCigarettes).Methods("GET")
 	r.HandleFunc("/cart", getCart).Methods("GET")
 	r.HandleFunc("/cart/add", addCigaretteToCart).Methods("POST")
-	r.HandleFunc("/cart/remove", removeItemFromCart).Methods("POST") // Новый маршрут
+	r.HandleFunc("/cart/remove", removeItemFromCart).Methods("POST")
 	r.HandleFunc("/cart/clear", clearCart).Methods("POST")
-
+	r.HandleFunc("/cigarette", getCigaretteByBrand).Methods("GET")
+	r.HandleFunc("/cigarette/update", updateCigarettePrice).Methods("POST")
 	r.HandleFunc("/", serveHTML)
 
 	log.Println("Server started on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
+}
+
+func getCigaretteByBrand(w http.ResponseWriter, r *http.Request) {
+	brand := r.URL.Query().Get("brand")
+	var cigarette Cigarette
+	err := assortmentCollection.FindOne(context.Background(), bson.M{"brand": brand}).Decode(&cigarette)
+	if err != nil {
+		http.Error(w, "Cigarette not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(cigarette)
+}
+
+func updateCigarettePrice(w http.ResponseWriter, r *http.Request) {
+	var updateData struct {
+		Brand string  `json:"brand"`
+		Price float64 `json:"price"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&updateData)
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	_, err = assortmentCollection.UpdateOne(
+		context.Background(),
+		bson.M{"brand": updateData.Brand},
+		bson.M{"$set": bson.M{"price": updateData.Price}},
+	)
+	if err != nil {
+		http.Error(w, "Error updating price", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Price updated successfully")
 }

@@ -1,91 +1,97 @@
-Cigarette Shop 
+# Cigarette Shop
 
-Project Description
+## Project Description
 
-This project is a simple web application and API for managing a cigarette shop. Users can browse an assortment of cigarettes, add items to a cart, view the cart, remove items, and clear the cart entirely. The application is backed by MongoDB for storing product assortment and cart data.
+Cigarette Shop is a simple web application and API for managing a cigarette shop. Users can:
 
-Team Members
+- Browse an assortment of cigarettes.
+- Add items to a cart.
+- View, remove, or clear items from the cart.
 
-Damir,Ilyas,Adilbek
+The application uses MongoDB to store product assortment and cart data.
 
-![image](https://github.com/user-attachments/assets/6d2a262d-2a5e-4763-bfac-3758ba26529d)
+---
 
+## Team Members
 
+- Damir
+- Ilyas
+- Adilbek
 
+![Project Image](https://github.com/user-attachments/assets/6d2a262d-2a5e-4763-bfac-3758ba26529d)
 
-Setup and Run Instructions
+---
 
-Prerequisites
+## Setup and Run Instructions
 
-Go installed (version 1.23.4)
+### Prerequisites
 
-MongoDB installed and running locally
+Ensure the following tools are installed:
 
-Git installed
+- **Go** (version 1.23.4)
+- **MongoDB** (running locally)
+- **Git**
 
-Steps to Run the Project
+### Steps to Run the Project
 
-Clone the Repository:
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/master367/Cigarette_shop
+   ```
 
-git clone https://github.com/master367/Cigarette_shop
+2. **Install Dependencies:**
+   Use `go mod` to install necessary dependencies:
+   ```bash
+   go mod tidy
+   ```
 
+3. **Set Up MongoDB:**
+   - Ensure MongoDB is running on `localhost:27017`.
+   - Create a database named `Shop`.
+   - Create two collections: `assortment` and `cart`.
+   - Populate the `assortment` collection with sample data if needed.
 
-Install Dependencies:
-Use go mod to install necessary Go dependencies.
+4. **Run the Server:**
+   ```bash
+   go run main.go
+   ```
 
-go mod tidy
+5. **Access the Application:**
+   Open your browser and navigate to:
+   - [http://localhost:8080](http://localhost:8080)
 
-Set Up MongoDB:
+---
 
-Ensure MongoDB is running on localhost:27017.
+## API Endpoints
 
-Create a database named Shop.
+### Assortment
+- **GET /cigarettes**: Retrieve all available cigarettes.
 
-Create two collections: assortment and cart.
+### Cart
+- **GET /cart**: View all items in the cart.
+- **POST /cart/add**: Add a cigarette to the cart. *(JSON Body: `{ "brand": "Brand Name", "price": 10.0 }`)*
+- **POST /cart/remove**: Remove a cigarette from the cart. *(JSON Body: `{ "brand": "Brand Name" }`)*
+- **POST /cart/clear**: Clear all items from the cart.
 
-Populate the assortment collection with sample data if needed.
+### Frontend
+- **GET /**: Serve the `index.html` file for the main interface.
 
-Run the Server:
+---
 
-go run main.go
+## Tools and Resources
 
-Access the Application:
-Open your browser and go to http://localhost:8080.
+- **Backend Framework:** Gorilla Mux
+- **Database:** MongoDB
+- **Template Engine:** Go HTML Templates
+- **Programming Language:** Go
 
-API Endpoints
+### Other Tools
 
-Assortment
+- IntelliJ IDEA (or any Go IDE)
+- Postman (for API testing)
+- GitHub (for version control)
 
-GET /cigarettes: Retrieve all available cigarettes.
+---
 
-Cart
+Enjoy using the Cigarette Shop application!
 
-GET /cart: View all items in the cart.
-
-POST /cart/add: Add a cigarette to the cart. (JSON Body: { "brand": "Brand Name", "price": 10.0 })
-
-POST /cart/remove: Remove a cigarette from the cart. (JSON Body: { "brand": "Brand Name" })
-
-POST /cart/clear: Clear all items from the cart.
-
-Frontend
-
-GET /: Serve the HTML page (index.html) for the main interface.
-
-Tools and Resources
-
-Backend Framework: Gorilla Mux
-
-Database: MongoDB
-
-Template Engine: Go HTML Templates
-
-Language: Go
-
-Other Tools:
-
-IntelliJ IDEA or any Go IDE
-
-Postman (for API testing)
-
-GitHub (for version control)

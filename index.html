@@ -6,33 +6,140 @@
   <title>Cigarette Shop</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f2f5;
       margin: 0;
       padding: 0;
+      color: #333;
     }
+
     .container {
-      width: 80%;
-      margin: 20px auto;
+      width: 90%;
+      max-width: 1200px;
+      margin: 30px auto;
     }
-    h1 {
+
+    h1, h2 {
       text-align: center;
+      color: #444;
     }
-    .product, .cart-item {
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-top: 40px;
+      font-size: 1.8em;
+    }
+
+    .filters, .search, .update, .pagination {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .filters select, .filters input,
+    .search input, .update input {
+      margin-right: 10px;
+      padding: 8px;
+      font-size: 1em;
       border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-      background-color: white;
+      border-radius: 5px;
     }
+
     button {
-      padding: 5px 10px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .product, .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .product h3, .cart-item h4 {
+      margin: 0;
+    }
+
+    .product p, .cart-item p {
+      margin: 5px 0;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pagination button {
+      margin: 0 5px;
+    }
+
+    #products, #cart {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
+
 <div class="container">
   <h1>Cigarette Shop</h1>
+
+  <div class="search">
+    <h2>Search Cigarette</h2>
+    <input type="text" id="searchBrand" placeholder="Enter brand">
+    <button onclick="searchByBrand()">Search</button>
+    <div id="searchResult"></div>
+  </div>
+
+  <div class="update">
+    <h2>Update Price</h2>
+    <input type="text" id="updateBrand" placeholder="Enter brand">
+    <input type="number" id="updatePrice" placeholder="Enter new price">
+    <button onclick="updatePrice()">Update</button>
+    <div id="updateResult"></div>
+  </div>
+
+  <div class="filters">
+    <h2>Filter and Sort</h2>
+    <input type="text" id="filterBrand" placeholder="Filter by brand">
+    <select id="sortField">
+      <option value="">Sort By</option>
+      <option value="brand">Brand</option>
+      <option value="price">Price</option>
+    </select>
+    <select id="sortOrder">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+    <button onclick="fetchFilteredProducts()">Apply</button>
+  </div>
+
+  <div class="pagination">
+    <button id="prevPage" onclick="changePage(-1)">Previous</button>
+    <span id="currentPage">1</span>
+    <button id="nextPage" onclick="changePage(1)">Next</button>
+  </div>
+
   <h2>Products</h2>
   <div id="products"></div>
 
@@ -46,36 +153,69 @@
   const cartContainer = document.getElementById('cart');
   const clearCartBtn = document.getElementById('clearCartBtn');
 
-  async function fetchProducts() {
-    const response = await fetch('/cigarettes');
+  let currentPage = 1;
+  let limit = 10;
+
+  async function fetchFilteredProducts() {
+    const filterBrand = document.getElementById('filterBrand').value;
+    const sortField = document.getElementById('sortField').value;
+    const sortOrder = document.getElementById('sortOrder').value;
+
+    const queryParams = new URLSearchParams({
+      brand: filterBrand,
+      sortField,
+      sortOrder,
+      limit,
+      page: currentPage
+    });
+
+    const response = await fetch(`/cigarettes?${queryParams}`);
     const products = await response.json();
+
     productsContainer.innerHTML = '';
     products.forEach(product => {
       const div = document.createElement('div');
       div.classList.add('product');
       div.innerHTML = `
-                    <h3>${product.brand}</h3>
-                    <p>Price: $${product.price}</p>
-                    <button onclick="addToCart('${product.brand}', ${product.price})">Add to Cart</button>
-                `;
+    <h3>${product.brand}</h3>
+    <p>Type: ${product.type}</p> <!-- Добавить тип -->
+    <p>Price: $${product.price}</p>
+    <p>Category: ${product.category}</p> <!-- Добавить категорию -->
+    <button onclick="addToCart('${product.brand}', ${product.price})">Add to Card</button>
+  `;
       productsContainer.appendChild(div);
     });
+
+  }
+
+  function changePage(delta) {
+    currentPage += delta;
+    if (currentPage < 1) currentPage = 1;
+    document.getElementById('currentPage').textContent = currentPage;
+    fetchFilteredProducts();
   }
 
   async function fetchCart() {
     const response = await fetch('/cart');
     const cart = await response.json();
     cartContainer.innerHTML = '';
-    cart.forEach(item => {
-      const div = document.createElement('div');
-      div.classList.add('cart-item');
-      div.innerHTML = `
-                    <h4>${item.brand}</h4>
-                    <p>Price: $${item.price}</p>
-                    <button onclick="removeFromCart('${item.brand}')">Remove</button>
-                `;
-      cartContainer.appendChild(div);
-    });
+    if (cart.length === 0) {
+      cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+    } else {
+      cart.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('cart-item');
+        div.innerHTML = `
+    <h4>${item.brand}</h4>
+    <p>Type: ${item.type}</p> <!-- Добавить тип -->
+    <p>Price: $${item.price}</p>
+    <p>Category: ${item.category}</p> <!-- Добавить категорию -->
+    <button onclick="removeFromCart('${item.brand}')">Delete</button>
+  `;
+        cartContainer.appendChild(div);
+      });
+
+    }
   }
 
   async function addToCart(brand, price) {
@@ -107,10 +247,55 @@
     fetchCart();
   }
 
+  async function searchByBrand() {
+    const brand = document.getElementById('searchBrand').value;
+    const response = await fetch(`/cigarette?brand=${brand}`);
+    const resultDiv = document.getElementById('searchResult');
+    if (response.status === 200) {
+      const result = await response.json();
+      resultDiv.innerHTML = `
+    <h3>${result.brand}</h3>
+    <p>Type: ${result.type}</p> <!-- Добавить тип -->
+    <p>Price: $${result.price}</p>
+    <p>Category: ${result.category}</p> <!-- Добавить категорию -->
+  `;
+    } else {
+      resultDiv.innerHTML = `<p>Курительная продукция не найдена</p>`;
+    }
+
+  }
+
+  async function updatePrice() {
+    const brand = document.getElementById('updateBrand').value;
+    const price = parseFloat(document.getElementById('updatePrice').value);
+
+    if (!brand || isNaN(price) || price <= 0) {
+      alert("Please enter a valid brand and price.");
+      return;
+    }
+
+    const response = await fetch('/cigarette/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ brand, price })
+    });
+
+    const resultDiv = document.getElementById('updateResult');
+    if (response.status === 200) {
+      resultDiv.innerHTML = `<p>Price updated successfully</p>`;
+      fetchFilteredProducts();
+    } else {
+      resultDiv.innerHTML = `<p>Error updating price</p>`;
+    }
+  }
+
   clearCartBtn.addEventListener('click', clearCart);
 
-  fetchProducts();
+  fetchFilteredProducts();
   fetchCart();
 </script>
+
 </body>
 </html>

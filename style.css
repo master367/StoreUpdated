@@ -1,0 +1,51 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    width: 80%;
+    margin: 20px auto;
+}
+h1, h2 {
+    text-align: center;
+}
+.product, .cart-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+}
+button {
+    padding: 5px 10px;
+    cursor: pointer;}
+.search, .update {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+}
+.header .header-menu{
+    display: flex;
+    flex-direction:row;
+    background-color: rgb(24, 45, 73);
+    height: 50px;
+    width: 100%;
+}
+.header-menu{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.header-menu .menu a{
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+.header .preheader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
